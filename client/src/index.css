@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+.ReactModal__Overlay--after-open {
+  background-color: rgb(1 1 1 / 47%) !important;
+}
