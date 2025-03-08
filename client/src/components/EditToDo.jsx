@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { getSingleTodo, updateTodo } from "../api/api";
 import { ErrorToast, SuccessToast } from "../helper/helper";
 import { useNavigate, useParams } from "react-router-dom";
+import Loader from "./Loader";
 
 const EditToDo = () => {
+  const [loading, setLoading] = useState(false);
   const [singleData, setSingleData] = useState([]);
   const [status, setStatus] = useState("");
   const { id } = useParams();
@@ -11,9 +13,11 @@ const EditToDo = () => {
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       let res = await getSingleTodo(id);
       setSingleData(res.data);
       setStatus(singleData?.status || "New");
+      setLoading(false);
     })();
   }, [id, singleData?.status]);
 
@@ -26,18 +30,17 @@ const EditToDo = () => {
       ErrorToast("Please fill all fields");
       return;
     }
-    console.log({ title, description, status });
-
+    setLoading(true);
     let res = await updateTodo(id, { title, description, status });
     if (res) {
       SuccessToast("Todo update successfully!");
-      titleRef.value = "";
-      desRef.value = "";
       navigate("/all-todo");
+      setLoading(false);
     }
   };
   return (
     <div>
+      <div>{loading && <Loader />}</div>
       <div className='  p-4 py-8'>
         <div className='heading text-center font-bold text-2xl m-5 text-gray-800 bg-white'>
           Update ToDo

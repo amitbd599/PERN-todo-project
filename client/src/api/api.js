@@ -1,10 +1,9 @@
 import axios from "axios";
-let baseUrl = "http://localhost:5000";
 
 // createTodo
 export const createTodo = async (reqBody) => {
   try {
-    await axios.post(baseUrl + "/create-todo", reqBody);
+    await axios.post("/api/create-todo", reqBody);
     return true;
   } catch (error) {
     console.log(error);
@@ -14,7 +13,7 @@ export const createTodo = async (reqBody) => {
 // getTodo
 export const getSingleTodo = async (id) => {
   try {
-    let res = await axios.get(baseUrl + "/get-single-todo/" + id);
+    let res = await axios.get("/api/get-single-todo/" + id);
     return res;
   } catch (error) {
     console.log(error);
@@ -24,7 +23,7 @@ export const getSingleTodo = async (id) => {
 // getTodo
 export const getTodo = async () => {
   try {
-    let res = await axios.get(baseUrl + "/get-todo");
+    let res = await axios.get("/api/get-todo");
     return res;
   } catch (error) {
     console.log(error);
@@ -34,7 +33,7 @@ export const getTodo = async () => {
 // delete-single-todo
 export const deleteSingleTodo = async (id) => {
   try {
-    let res = await axios.delete(baseUrl + "/delete-single-todo/" + id);
+    let res = await axios.delete("/api/delete-single-todo/" + id);
     return res;
   } catch (error) {
     console.log(error);
@@ -44,7 +43,7 @@ export const deleteSingleTodo = async (id) => {
 // updateTodo
 export const updateTodo = async (id, reqBody) => {
   try {
-    await axios.put(baseUrl + "/update-todo/" + id, reqBody);
+    await axios.put("/api/update-todo/" + id, reqBody);
     return true;
   } catch (error) {
     console.log(error);

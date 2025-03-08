@@ -1,9 +1,11 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { createTodo } from "../api/api";
 import { ErrorToast, SuccessToast } from "../helper/helper";
 import { useNavigate } from "react-router-dom";
+import Loader from "./Loader";
 
 const CreateToDo = () => {
+  const [loading, setLoading] = useState(false);
   let { titleRef, desRef, statusRef } = useRef();
   let navigate = useNavigate();
   let submitFun = async () => {
@@ -15,15 +17,17 @@ const CreateToDo = () => {
       return;
     }
     console.log({ title, description, status });
-
+    setLoading(true);
     let res = await createTodo({ title, description, status });
     if (res) {
       SuccessToast("Todo created successfully!");
+      setLoading(false);
       navigate("/all-todo");
     }
   };
   return (
     <div>
+      <div>{loading && <Loader />}</div>
       <div className='  p-4 py-8'>
         <div className='heading text-center font-bold text-2xl m-5 text-gray-800 bg-white'>
           Create ToDo

@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-
+const path = require("path");
 const pool = require("./db");
 
 const app = express();
@@ -12,7 +12,7 @@ app.use(cors());
 // Router
 
 // create-todo
-app.post("/create-todo", async (req, res) => {
+app.post("/api/create-todo", async (req, res) => {
   try {
     const { title, description, status } = req.body;
 
@@ -28,17 +28,17 @@ app.post("/create-todo", async (req, res) => {
 });
 
 // get-todo
-app.get("/get-todo", async (req, res) => {
+app.get("/api/get-todo", async (req, res) => {
   try {
     let allTodos = await pool.query("SELECT * FROM todo ORDER BY id ASC");
     res.status(200).json(allTodos.rows);
   } catch (error) {
-    log.error(error.message);
+    console.log(error.message);
   }
 });
 
 // get-single-todo
-app.get("/get-single-todo/:id", async (req, res) => {
+app.get("/api/get-single-todo/:id", async (req, res) => {
   try {
     let { id } = req.params;
     let todo = await pool.query("SELECT * FROM todo WHERE id=$1", [id]);
@@ -49,7 +49,7 @@ app.get("/get-single-todo/:id", async (req, res) => {
 });
 
 // update-todo
-app.put("/update-todo/:id", async (req, res) => {
+app.put("/api/update-todo/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, status } = req.body;
@@ -64,7 +64,7 @@ app.put("/update-todo/:id", async (req, res) => {
 });
 
 // delete-single-todo
-app.delete("/delete-single-todo/:id", async (req, res) => {
+app.delete("/api/delete-single-todo/:id", async (req, res) => {
   try {
     let { id } = req.params;
     let deleteTodos = await pool.query("DELETE FROM todo WHERE id=$1", [id]);
@@ -75,13 +75,19 @@ app.delete("/delete-single-todo/:id", async (req, res) => {
 });
 
 // delete-all
-app.delete("/delete-all", async (req, res) => {
+app.delete("/api/delete-all", async (req, res) => {
   try {
     let deleteTodos = await pool.query("DELETE FROM todo");
     res.status(200).json("All todos deleted successfully.");
   } catch (error) {
     console.log(error.message);
   }
+});
+
+// Add React Front End Routing
+app.use(express.static("client/dist"));
+app.get("*", function (req, res) {
+  res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
 });
 
 app.listen(5000, () => {
