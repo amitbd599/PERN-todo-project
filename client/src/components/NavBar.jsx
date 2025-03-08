@@ -41,7 +41,11 @@ const NavBar = () => {
                   </NavLink>
                 </li>
                 <li>
-                  <Link to='#' className='text-[18px] font-medium p-[10px]'>
+                  <Link
+                    target='_blank'
+                    to='https://github.com/amitbd599/PERN-todo-project'
+                    className='text-[18px] font-medium p-[10px]'
+                  >
                     Git Link
                   </Link>
                 </li>
