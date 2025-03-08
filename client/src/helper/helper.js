@@ -15,21 +15,18 @@ export const SuccessToast = (msg) => {
   });
 };
 
-export const DeleteAlert = (apiFun, id) => {
+export const DeleteAlert = () => {
   return MySwal.fire({
     title: "Are you sure?",
     text: "You won't be able to revert this!",
-    // icon: "warning",
-    iconHtml: '<i class="ri-error-warning-line icon__inner"></i>',
+    icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",
     confirmButtonText: "Yes, delete it!",
   }).then((result) => {
     if (result.isConfirmed) {
-      return apiFun(id).then((result) => {
-        return result;
-      });
+      return true;
     }
   });
 };

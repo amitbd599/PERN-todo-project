@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import {
   FaPenToSquare,
   FaRegCircleXmark,
+  FaRegEye,
   FaRegTrashCan,
 } from "react-icons/fa6";
 import Modal from "react-modal";
-import { getTodo } from "../api/api";
+import { deleteSingleTodo, getSingleTodo, getTodo } from "../api/api";
+import { DeleteAlert, SuccessToast } from "../helper/helper";
+import { Link } from "react-router-dom";
 const AllToDo = () => {
   const [data, setData] = useState([]);
+  const [singleData, setSingleData] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -19,13 +23,30 @@ const AllToDo = () => {
 
   console.log(data);
 
-  function openModal() {
+  let openModal = () => {
     setIsOpen(true);
-  }
+  };
 
-  function closeModal() {
+  let closeModal = () => {
     setIsOpen(false);
-  }
+  };
+
+  let deleteTodo = async (id) => {
+    let deleteAlert = await DeleteAlert();
+    if (deleteAlert) {
+      await deleteSingleTodo(id);
+      SuccessToast("Todo delete successfully!");
+      let res = await getTodo();
+      setData(res.data);
+    }
+  };
+
+  let showSingleTodo = async (id) => {
+    let res = await getSingleTodo(id);
+    setSingleData(res?.data);
+  };
+
+  console.log(singleData);
 
   return (
     <section className='mt-[80px]'>
@@ -57,25 +78,46 @@ const AllToDo = () => {
               </tr>
             </thead>
             <tbody className='divide-y divide-gray-100 border-t border-gray-100'>
-              <tr className='hover:bg-gray-50'>
-                <td className='px-6 py-4'>01</td>
-                <td className='px-6 py-4'>Product Designer</td>
-                <td className='px-6 py-4'>
-                  <span className='inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600'>
-                    Design
-                  </span>
-                </td>
-                <td className='px-6 py-4'>
-                  <div className='flex justify-end gap-4'>
-                    <button>
-                      <FaRegTrashCan className='text-[30px] p-[4px] cursor-pointer' />
-                    </button>
-                    <button onClick={openModal}>
-                      <FaPenToSquare className='text-[30px] p-[4px] cursor-pointer' />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+              {data?.map((item, index) => (
+                <tr key={index} className='hover:bg-gray-50'>
+                  <td className='px-6 py-4 text-[16px]'>{item?.id}</td>
+                  <td className='px-6 py-4  text-[16px]'>{item?.title}</td>
+                  <td className='px-6 py-4'>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full  px-4 py-1 text-[14px] font-semibold
+                    ${
+                      item?.status === "New"
+                        ? "text-blue-600 bg-blue-100"
+                        : item?.status === "Complete"
+                        ? "text-green-600 bg-green-100"
+                        : item?.status === "Cancel"
+                        ? "text-red-600 bg-red-100"
+                        : ""
+                    } `}
+                    >
+                      {item?.status}
+                    </span>
+                  </td>
+                  <td className='px-6 py-4'>
+                    <div className='flex justify-end gap-4'>
+                      <button
+                        onClick={() => {
+                          showSingleTodo(item?.id);
+                          openModal();
+                        }}
+                      >
+                        <FaRegEye className='text-[30px] p-[4px] cursor-pointer' />
+                      </button>
+                      <Link to={`/update-todo/${item?.id}`}>
+                        <FaPenToSquare className='text-[30px] p-[4px] cursor-pointer' />
+                      </Link>
+                      <button onClick={() => deleteTodo(item?.id)}>
+                        <FaRegTrashCan className='text-[30px] p-[4px] cursor-pointer' />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -95,38 +137,42 @@ const AllToDo = () => {
             <FaRegCircleXmark className='text-[30px] text-red-500' />
           </button>
           <div>
-            <div className='  p-4 py-8'>
+            <div className='p-4 py-8'>
               <div className='heading text-center font-bold text-2xl m-5 text-gray-800 bg-white'>
-                Edit ToDos
+                View ToDos
               </div>
-              <div className=' mx-auto  flex flex-col text-gray-800 border border-gray-300 p-4 shadow-lg max-w-2xl'>
-                <label htmlFor='title'>Title:</label>
-                <input
-                  className=' bg-gray-100 border border-gray-300 p-2 mb-4 outline-none'
-                  type='text'
-                  id='title'
-                  placeholder='Enter title...'
-                />
+              <div className=' mx-auto  grid gap-[16px] text-gray-800 p-4'>
+                <div>
+                  <p className='text-[16px] '>
+                    <span className='font-bold'>ID:</span> {singleData?.id}
+                  </p>
+                </div>
+                <div>
+                  <span className='font-bold'>Title:</span>
+                  <p className='text-[16px] '>{singleData?.title}</p>
+                </div>
 
-                <label htmlFor='description'>Description:</label>
-                <textarea
-                  className=' bg-gray-100 p-3 h-40 border border-gray-300 outline-none'
-                  defaultValue={""}
-                  id='description'
-                  placeholder='Enter description...'
-                />
+                <div>
+                  <span className='font-bold'>Description:</span>
+                  <p className='text-[16px] '>{singleData?.description}</p>
+                </div>
 
-                <label className='mt-2'>Status:</label>
-                <select className='bg-gray-100 border border-gray-300 p-2 mb-4 outline-none '>
-                  <option>New</option>
-                  <option>Cancel</option>
-                  <option>Complete</option>
-                </select>
-
-                {/* Buttons */}
-                <button className='p-2 font-semibold cursor-pointer text-white  bg-indigo-500'>
-                  Update
-                </button>
+                <div className='flex gap-[10px] items-center'>
+                  <span className='font-bold'>Status:</span>
+                  <span
+                    className={`text-[14px] inline-flex items-center gap-1 rounded-full  px-[10px] py-[5px] leading-[100%] font-semibold ${
+                      singleData?.status === "New"
+                        ? "text-blue-600 bg-blue-100"
+                        : singleData?.status === "Complete"
+                        ? "text-green-600 bg-green-100"
+                        : singleData?.status === "Cancel"
+                        ? "text-red-600 bg-red-100"
+                        : ""
+                    }`}
+                  >
+                    {singleData?.status}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

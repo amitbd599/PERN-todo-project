@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const NavBar = () => {
   return (
@@ -17,17 +17,28 @@ const NavBar = () => {
             <nav>
               <ul className='flex items-center justify-end gap-[20px]'>
                 <li>
-                  <Link to='/' className='text-[18px] font-medium p-[10px]'>
+                  <NavLink
+                    to='/'
+                    className={(navData) =>
+                      `text-[18px] font-medium p-[10px] ${
+                        navData.isActive && "text-[#4E42F6]"
+                      }`
+                    }
+                  >
                     Create ToDo
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
+                  <NavLink
+                    className={(navData) =>
+                      `text-[18px] font-medium p-[10px] ${
+                        navData.isActive && "text-[#4E42F6]"
+                      }`
+                    }
                     to='/all-todo'
-                    className='text-[18px] font-medium p-[10px]'
                   >
                     All ToDo
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
                   <Link to='#' className='text-[18px] font-medium p-[10px]'>

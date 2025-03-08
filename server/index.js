@@ -14,16 +14,14 @@ app.use(cors());
 // create-todo
 app.post("/create-todo", async (req, res) => {
   try {
-    const { description } = req.body;
+    const { title, description, status } = req.body;
 
     const newTodo = await pool.query(
-      "INSERT INTO todo (description) VALUES($1) RETURNING *",
-      [description]
+      "INSERT INTO todo (title, description,status)  VALUES($1, $2, $3) RETURNING *",
+      [title, description, status]
     );
 
-    res.json(newTodo.rows[0]);
-
-    console.log(description);
+    res.status(201).json(newTodo.rows[0]);
   } catch (error) {
     console.log(error.message);
   }
@@ -32,8 +30,8 @@ app.post("/create-todo", async (req, res) => {
 // get-todo
 app.get("/get-todo", async (req, res) => {
   try {
-    let allTodos = await pool.query("SELECT * FROM todo");
-    res.json(allTodos.rows);
+    let allTodos = await pool.query("SELECT * FROM todo ORDER BY id ASC");
+    res.status(200).json(allTodos.rows);
   } catch (error) {
     log.error(error.message);
   }
@@ -43,8 +41,8 @@ app.get("/get-todo", async (req, res) => {
 app.get("/get-single-todo/:id", async (req, res) => {
   try {
     let { id } = req.params;
-    let todo = await pool.query("SELECT * FROM todo WHERE todo_id=$1", [id]);
-    res.json(todo.rows[0]);
+    let todo = await pool.query("SELECT * FROM todo WHERE id=$1", [id]);
+    res.status(200).json(todo.rows[0]);
   } catch (error) {
     console.log(error.message);
   }
@@ -54,12 +52,12 @@ app.get("/get-single-todo/:id", async (req, res) => {
 app.put("/update-todo/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { description } = req.body;
+    const { title, description, status } = req.body;
     let updateTodo = await pool.query(
-      "UPDATE todo SET description=$1 WHERE todo_id=$2",
-      [description, id]
+      "UPDATE todo SET title = $1, description = $2, status = $3 WHERE id = $4",
+      [title, description, status, id]
     );
-    res.json(`Todo with id ${id} updated successfully.`);
+    res.status(200).json(`Todo with id ${id} updated successfully.`);
   } catch (error) {
     console.log(error.message);
   }
@@ -69,10 +67,8 @@ app.put("/update-todo/:id", async (req, res) => {
 app.delete("/delete-single-todo/:id", async (req, res) => {
   try {
     let { id } = req.params;
-    let deleteTodos = await pool.query("DELETE FROM todo WHERE todo_id=$1", [
-      id,
-    ]);
-    res.json(`Todo with id ${id} deleted successfully.`);
+    let deleteTodos = await pool.query("DELETE FROM todo WHERE id=$1", [id]);
+    res.status(200).json(`Todo with id ${id} deleted successfully.`);
   } catch (error) {
     console.log(error.message);
   }
@@ -82,7 +78,7 @@ app.delete("/delete-single-todo/:id", async (req, res) => {
 app.delete("/delete-all", async (req, res) => {
   try {
     let deleteTodos = await pool.query("DELETE FROM todo");
-    res.json("All todos deleted successfully.");
+    res.status(200).json("All todos deleted successfully.");
   } catch (error) {
     console.log(error.message);
   }
